@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/relationshipspum</path>
+    <page_callback>CRM_Transfercivicrmrelationship_Page_RelationshipsPUM</page_callback>
+    <title>RelationshipsPUM</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

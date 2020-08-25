@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<extension key="nl.pum.transfercivicrmrelationship" type="module">
+  <file>transfercivicrmrelationship</file>
+  <name>Transfer CiviCRM Relationships</name>
+  <description>This extension adds an option in the civicrm relationship tab to transfer relationships to someone else</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>ruudgithub</author>
+    <email>ruudgithub@users.noreply.github.com</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">https://github.com/PUMNL/nl.pum.transfercivicrmrelationship</url>
+    <url desc="Documentation">https://github.com/PUMNL/nl.pum.transfercivicrmrelationship/README.md</url>
+    <url desc="Support"></url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2020-08-25</releaseDate>
+  <version>1.0</version>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>4.4.8</ver>
+  </compatibility>
+  <comments></comments>
+  <civix>
+    <namespace>CRM/Transfercivicrmrelationship</namespace>
+  </civix>
+</extension>
