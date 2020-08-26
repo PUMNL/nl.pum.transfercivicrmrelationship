@@ -164,6 +164,7 @@ cj( function() {
           <th class="sorting-disabled" rowspan="1" colspan="1">Start date</th>
           <th class="sorting-disabled" rowspan="1" colspan="1">End date</th>
           <th class="sorting-disabled" rowspan="1" colspan="1">City</th>
+          <th class="sorting-disabled" rowspan="1" colspan="1">Country</th>
           <th class="sorting-disabled" rowspan="1" colspan="1">E-mail</th>
           <th class="sorting-disabled" rowspan="1" colspan="1">Phone</th>
           <th class="sorting-disabled" rowspan="1" colspan="1">Case ID</th>
@@ -180,15 +181,32 @@ cj( function() {
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_id}</td>
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_type}</td>
               {if $rel.current_contact eq $rel.contact_id_a}
-              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.contact_b_name}</td>
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if}><a href="/civicrm/contact/view?reset=1&cid={$rel.contact_id_b}">{$rel.contact_b_name}</a></td>
               {else}
-              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.contact_a_name}</td>
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if}><a href="/civicrm/contact/view?reset=1&cid={$rel.contact_id_a}">{$rel.contact_a_name}</a></td>
               {/if}
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_start}</td>
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_end}</td>
-              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_city}</td>
-              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_email}</td>
-              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_phone}</td>
+              {if $rel.current_contact eq $rel.contact_id_a}
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.relb_city}</td>
+              {else}
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rela_city}</td>
+              {/if}
+              {if $rel.current_contact eq $rel.contact_id_a}
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.relb_country}</td>
+              {else}
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rela_country}</td>
+              {/if}
+              {if $rel.current_contact eq $rel.contact_id_a}
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if} style="color: grey;"><a href="mailto:{$rel.relb_email}">{$rel.relb_email}</a></td>
+              {else}
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if} style="color: grey;"><a href="mailto:{$rel.rela_email}">{$rel.rela_email}</a></td>
+              {/if}
+              {if $rel.current_contact eq $rel.contact_id_a}
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if}><a href="tel:{$rel.relb_phone}">{$rel.relb_phone}</a></td>
+              {else}
+              <td{if $rel.is_deleted eq 1} class="font-red"{/if}><a href="tel:{$rel.rela_phone}">{$rel.rela_phone}</a></td>
+              {/if}
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{if $rel.case_id}<a href="/civicrm/contact/view/case?reset=1&id={$rel.case_id}&cid={$rel.contact_id_a}&action=view&context=case&selectedChild=case">{$rel.case_id}</a>{/if}</td>
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{if $rel.case_id}{$rel.actions} {$rel.moreActions}{/if}</td>
               {if $rel.current_contact eq $rel.contact_id_a}
@@ -213,15 +231,32 @@ cj( function() {
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_id}</td>
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_type}</td>
               {if $irel.current_contact eq $irel.contact_id_a}
-              <td{if $irel.is_deleted eq 1} class="font-red"{/if}>{$irel.contact_b_name}</td>
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if}><a href="/civicrm/contact/view?reset=1&cid={$irel.contact_id_b}">{$irel.contact_b_name}</a></td>
               {else}
-              <td{if $irel.is_deleted eq 1} class="font-red"{/if}>{$irel.contact_a_name}</td>
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if}><a href="/civicrm/contact/view?reset=1&cid={$irel.contact_id_a}">{$irel.contact_a_name}</a></td>
               {/if}
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_start}</td>
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_end}</td>
-              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_city}</td>
-              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_email}</td>
-              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_phone}</td>
+              {if $irel.current_contact eq $irel.contact_id_a}
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.relb_city}</td>
+              {else}
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rela_city}</td>
+              {/if}
+              {if $irel.current_contact eq $irel.contact_id_a}
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.relb_country}</td>
+              {else}
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rela_country}</td>
+              {/if}
+              {if $irel.current_contact eq $irel.contact_id_a}
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;"><a href="mailto:{$irel.relb_email}">{$irel.relb_email}</a></td>
+              {else}
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;"><a href="mailto:{$irel.rela_email}">{$irel.rela_email}</a></td>
+              {/if}
+              {if $irel.current_contact eq $irel.contact_id_a}
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;"><a href="tel:{$irel.relb_phone}">{$irel.relb_phone}</a></td>
+              {else}
+              <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;"><a href="tel:{$irel.rela_phone}">{$irel.rela_phone}</a></td>
+              {/if}
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{if empty($irel.case_id)}{else}<a href="/civicrm/contact/view/case?reset=1&id={$irel.case_id}&cid={$irel.contact_id_a}&action=view&context=case&selectedChild=case">{$irel.case_id}</a>{/if}</td>
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.actions} {$irel.moreActions}</td>
               </td>
@@ -247,11 +282,8 @@ cj( function() {
         <div class="crm-pager">
           {if ! isset($noForm) || ! $noForm}
             <span class="element-right">
-            {if $location eq 'top'}
-              {$pager->_response.titleTop}&nbsp;<input class="form-submit" name="{$pager->_response.buttonTop}" value="{ts}Go{/ts}" type="submit"/>
-            {else}
-              {$pager->_response.titleBottom}&nbsp;<input class="form-submit" name="{$pager->_response.buttonBottom}" value="{ts}Go{/ts}" type="submit"/>
-            {/if}
+              {$pager->_response.titleBottom}&nbsp;
+              <input type="submit" onclick="cj('#Relationships_PUM').load('/index.php?cid={$clientId}&q=civicrm/relationshipspum&force=1&crmPID='+cj('input[name=&quot;crmPID_B&quot;]').val()+'&snippet=1');" class="form-submit" style="cursor:pointer;" value="Go">
             </span>
           {/if}
           <span style="margin-left:10px;">

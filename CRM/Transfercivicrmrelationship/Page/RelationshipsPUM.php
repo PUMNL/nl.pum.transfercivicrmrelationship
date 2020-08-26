@@ -61,22 +61,32 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
   protected function getDaoRelationships() {
     $params = array();
     list($offset, $limit) = $this->_pager->getOffsetAndRowCount();
-    $query = "SELECT DISTINCT rel.id as 'rel_id', rel.contact_id_a, rel.contact_id_b, rel.case_id, rt.label_a_b as 'rel_type', cta.display_name as 'contact_a_name', ctb.display_name as 'contact_b_name', rel.start_date as 'rel_start', rel.end_date as 'rel_end', adr.city as 'rel_city', eml.email as 'rel_email',tel.phone AS 'rel_phone', rel.is_active FROM civicrm_relationship rel
+    $query = "SELECT DISTINCT rel.id as 'rel_id', rel.contact_id_a, rel.contact_id_b, rel.case_id, rt.label_a_b as 'rel_type', cta.display_name as 'contact_a_name', ctb.display_name as 'contact_b_name', rel.start_date as 'rel_start', rel.end_date as 'rel_end', adra.city as 'rela_city', adrb.city as 'relb_city', ctya.name as 'rela_country', ctyb.name as 'relb_country', emla.email as 'rela_email', emlb.email as 'relb_email', tela.phone AS 'rela_phone', telb.phone AS 'relb_phone', rel.is_active FROM civicrm_relationship rel
               LEFT JOIN civicrm_relationship_type rt ON rt.id = rel.relationship_type_id
               LEFT JOIN civicrm_contact cta ON cta.id = rel.contact_id_a
               LEFT JOIN civicrm_contact ctb ON ctb.id = rel.contact_id_b
-              LEFT JOIN civicrm_address adr ON adr.contact_id = rel.contact_id_b AND adr.is_primary = 1
-              LEFT JOIN civicrm_email eml ON eml.contact_id = rel.contact_id_b AND eml.is_primary = 1
-              LEFT JOIN civicrm_phone tel ON tel.contact_id = rel.contact_id_b AND tel.is_primary = 1
+              LEFT JOIN civicrm_address adra ON adra.contact_id = rel.contact_id_a AND adra.is_primary = 1
+              LEFT JOIN civicrm_address adrb ON adrb.contact_id = rel.contact_id_b AND adrb.is_primary = 1
+              LEFT JOIN civicrm_country ctya ON ctya.id = adra.country_id
+              LEFT JOIN civicrm_country ctyb ON ctyb.id = adrb.country_id
+              LEFT JOIN civicrm_email emla ON emla.contact_id = rel.contact_id_a AND emla.is_primary = 1
+              LEFT JOIN civicrm_email emlb ON emlb.contact_id = rel.contact_id_b AND emlb.is_primary = 1
+              LEFT JOIN civicrm_phone tela ON tela.contact_id = rel.contact_id_a AND tela.is_primary = 1
+              LEFT JOIN civicrm_phone telb ON telb.contact_id = rel.contact_id_b AND telb.is_primary = 1
               WHERE rel.contact_id_a = %1
               UNION
-              SELECT DISTINCT rel.id as 'rel_id', rel.contact_id_a, rel.contact_id_b, rel.case_id, rt.label_a_b as 'rel_type', cta.display_name as 'contact_a_name', ctb.display_name as 'contact_b_name', rel.start_date as 'rel_start', rel.end_date as 'rel_end', adr.city as 'rel_city', eml.email as 'rel_email',tel.phone AS 'rel_phone', rel.is_active FROM civicrm_relationship rel
+              SELECT DISTINCT rel.id as 'rel_id', rel.contact_id_a, rel.contact_id_b, rel.case_id, rt.label_a_b as 'rel_type', cta.display_name as 'contact_a_name', ctb.display_name as 'contact_b_name', rel.start_date as 'rel_start', rel.end_date as 'rel_end', adra.city as 'rela_city', adrb.city as 'relb_city', ctya.name as 'rela_country', ctyb.name as 'relb_country', emla.email as 'rela_email', emlb.email as 'relb_email', tela.phone AS 'rela_phone', telb.phone AS 'relb_phone', rel.is_active FROM civicrm_relationship rel
               LEFT JOIN civicrm_relationship_type rt ON rt.id = rel.relationship_type_id
               LEFT JOIN civicrm_contact cta ON cta.id = rel.contact_id_a
               LEFT JOIN civicrm_contact ctb ON ctb.id = rel.contact_id_b
-              LEFT JOIN civicrm_address adr ON adr.contact_id = rel.contact_id_b AND adr.is_primary = 1
-              LEFT JOIN civicrm_email eml ON eml.contact_id = rel.contact_id_b AND eml.is_primary = 1
-              LEFT JOIN civicrm_phone tel ON tel.contact_id = rel.contact_id_b AND tel.is_primary = 1
+              LEFT JOIN civicrm_address adra ON adra.contact_id = rel.contact_id_a AND adra.is_primary = 1
+              LEFT JOIN civicrm_address adrb ON adrb.contact_id = rel.contact_id_b AND adrb.is_primary = 1
+              LEFT JOIN civicrm_country ctya ON ctya.id = adra.country_id
+              LEFT JOIN civicrm_country ctyb ON ctyb.id = adrb.country_id
+              LEFT JOIN civicrm_email emla ON emla.contact_id = rel.contact_id_a AND emla.is_primary = 1
+              LEFT JOIN civicrm_email emlb ON emlb.contact_id = rel.contact_id_b AND emlb.is_primary = 1
+              LEFT JOIN civicrm_phone tela ON tela.contact_id = rel.contact_id_a AND tela.is_primary = 1
+              LEFT JOIN civicrm_phone telb ON telb.contact_id = rel.contact_id_b AND telb.is_primary = 1
               WHERE rel.contact_id_b = %1
               ";
 
@@ -99,22 +109,10 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
    */
   protected function getNumActiveRelationships() {
     $params = array(1=> array($this->clientId, 'Integer'));
-    $query = "SELECT DISTINCT rel.id as 'rel_id', rel.contact_id_a, rel.contact_id_b, rel.case_id, rt.label_a_b as 'rel_type', cta.display_name as 'contact_a_name', ctb.display_name as 'contact_b_name', rel.start_date as 'rel_start', rel.end_date as 'rel_end', adr.city as 'rel_city', eml.email as 'rel_email',tel.phone AS 'rel_phone', rel.is_active FROM civicrm_relationship rel
-              LEFT JOIN civicrm_relationship_type rt ON rt.id = rel.relationship_type_id
-              LEFT JOIN civicrm_contact cta ON cta.id = rel.contact_id_a
-              LEFT JOIN civicrm_contact ctb ON ctb.id = rel.contact_id_b
-              LEFT JOIN civicrm_address adr ON adr.contact_id = rel.contact_id_b AND adr.is_primary = 1
-              LEFT JOIN civicrm_email eml ON eml.contact_id = rel.contact_id_b AND eml.is_primary = 1
-              LEFT JOIN civicrm_phone tel ON tel.contact_id = rel.contact_id_b AND tel.is_primary = 1
+    $query = "SELECT DISTINCT rel.id as 'rel_id' FROM civicrm_relationship rel
               WHERE rel.contact_id_a = %1 AND rel.is_active = 1 AND (rel.end_date IS NULL OR rel.end_date > NOW())
               UNION
-              SELECT DISTINCT rel.id as 'rel_id', rel.contact_id_a, rel.contact_id_b, rel.case_id, rt.label_a_b as 'rel_type', cta.display_name as 'contact_a_name', ctb.display_name as 'contact_b_name', rel.start_date as 'rel_start', rel.end_date as 'rel_end', adr.city as 'rel_city', eml.email as 'rel_email',tel.phone AS 'rel_phone', rel.is_active FROM civicrm_relationship rel
-              LEFT JOIN civicrm_relationship_type rt ON rt.id = rel.relationship_type_id
-              LEFT JOIN civicrm_contact cta ON cta.id = rel.contact_id_a
-              LEFT JOIN civicrm_contact ctb ON ctb.id = rel.contact_id_b
-              LEFT JOIN civicrm_address adr ON adr.contact_id = rel.contact_id_b AND adr.is_primary = 1
-              LEFT JOIN civicrm_email eml ON eml.contact_id = rel.contact_id_b AND eml.is_primary = 1
-              LEFT JOIN civicrm_phone tel ON tel.contact_id = rel.contact_id_b AND tel.is_primary = 1
+              SELECT DISTINCT rel.id as 'rel_id' FROM civicrm_relationship rel
               WHERE rel.contact_id_b = %1 AND rel.is_active = 1 AND (rel.end_date IS NULL OR rel.end_date > NOW())
               ";
     return CRM_Core_DAO::executeQuery($query, $params);
@@ -140,9 +138,14 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
     $displayRow['case_id'] = $dao->case_id;
     $displayRow['rel_start'] = $dao->rel_start;
     $displayRow['rel_end'] = $dao->rel_end;
-    $displayRow['rel_city'] = $dao->rel_city;
-    $displayRow['rel_email'] = $dao->rel_email;
-    $displayRow['rel_phone'] = $dao->rel_phone;
+    $displayRow['rela_city'] = $dao->rela_city;
+    $displayRow['relb_city'] = $dao->relb_city;
+    $displayRow['rela_country'] = $dao->rela_country;
+    $displayRow['relb_country'] = $dao->relb_country;
+    $displayRow['rela_email'] = $dao->rela_email;
+    $displayRow['relb_email'] = $dao->relb_email;
+    $displayRow['rela_phone'] = $dao->rela_phone;
+    $displayRow['relb_phone'] = $dao->relb_phone;
     $displayRow['is_active'] = $dao->is_active;
 
     $permissions = array(CRM_Core_Permission::VIEW);
