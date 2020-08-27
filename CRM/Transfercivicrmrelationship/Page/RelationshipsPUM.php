@@ -35,8 +35,20 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
 
     global $user;
 
-    $isAdmin = in_array('administrator',$user->roles);
-    $this->assign('isAdmin', $isAdmin);
+    $canTransferRelationship = FALSE;
+    if(in_array('administrator',$user->roles)) {
+      $canTransferRelationship = TRUE;
+    } else if(in_array('P&O', $user->roles)) {
+      $canTransferRelationship = TRUE;
+    } else if(in_array('SSO', $user->roles)) {
+      $canTransferRelationship = TRUE;
+    } else if(in_array('Prof', $user->roles)) {
+      $canTransferRelationship = TRUE;
+    } else {
+      $canTransferRelationship = FALSE;
+    }
+
+    $this->assign('canTransferRelationship', $canTransferRelationship);
     $this->assign('clientId', $this->clientId);
     $this->assign('relationships', $displayRelationships);
     $this->assign('currentPage',$this->_pager->_currentPage);
