@@ -9,27 +9,30 @@ cj('#rel_selectall').click(function(){
 });
 
 function getUrlParameter(sParam) {
-    var sPageURL = window.location.search.substring(1),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
+  var sPageURL = window.location.search.substring(1),
+      sURLVariables = sPageURL.split('&'),
+      sParameterName,
+      i;
 
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
+  for (i = 0; i < sURLVariables.length; i++) {
+    sParameterName = sURLVariables[i].split('=');
 
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-        }
+    if (sParameterName[0] === sParam) {
+        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
     }
+  }
 }
 
 function update_old_relationship(relation_id){
   var date = new Date().toISOString().slice(0,10);
+  let update_rel_success = false;
 
   CRM.api('Relationship', 'delete', {'id': relation_id},{
-    success: function(data) {console.log('Relation: '+relation_id+' deleted') },
-    error: function(data) { }
+    success: function(result) {console.log('Old relation: '+relation_id+' deleted'); console.log(result); update_rel_success = true; },
+    error: function(result) {console.log('Error deleting old relation id: '+relation_id); console.log(result); update_rel_success = false; }
   });
+
+  return update_rel_success;
 }
 
 function transfer_relationship(relation_id, contact_id_a, to_contact_id, relationship_type_id, case_id, is_active){
@@ -40,32 +43,44 @@ function transfer_relationship(relation_id, contact_id_a, to_contact_id, relatio
   var yyyy = date.getFullYear();
 
   if(!case_id || case_id.length == 0) {
-    update_old_relationship(relation_id);
-
-    CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active}, {
-      success: function(data) {
-        cj('#Relationships_PUM').load(CRM.url('civicrm/relationshipspum',{snippet: 1, cid: current_cid}));
-
-        CRM.api('Relationship', 'get', {'sequential': 1, 'contact_id_b': current_cid, 'is_active': 1, 'rowCount': 0},{
-          success: function(data2) {
+    CRM.api('Relationship', 'delete', {'id': relation_id},{
+      success: function(result) {
+        CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active}, {
+          success: function(data) {
+            cj('#Relationships_PUM').load(CRM.url('civicrm/relationshipspum',{snippet: 1, cid: current_cid}));
             window.location.reload();
+          },
+          error: function(data) {
+            console.log('Error creating relationship 1');
+            console.log(data);
           }
         });
       },
-      error: function(data) {
-
+      error: function(result) {
+        console.log('Error deleting relation id: '+relation_id);
+        console.log(result);
       }
     });
+
+
   } else {
-    update_old_relationship(relation_id);
+    var date = new Date().toISOString().slice(0,10);
 
-    CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active, 'case_id': case_id}, {
-      success: function(data3) {
-        window.location.reload();
-
+    CRM.api('Relationship', 'delete', {'id': relation_id},{
+      success: function(result) {
+        CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active, 'case_id': case_id, 'check_permissions': 0}, {
+          success: function(result2) {
+            window.location.reload();
+          },
+          error: function(result3) {
+            console.log('Error creating relationship 2');
+            console.log(result3);
+          }
+        });
       },
-      error: function(data) {
-
+      error: function(result) {
+        console.log('Error deleting relation id: '+relation_id);
+        console.log(result);
       }
     });
   }
@@ -120,24 +135,24 @@ cj( function() {
         }
       }
     });
+
     var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=caseview' h=0 }"{literal};
 
-      cj("#role_contact").autocomplete( contactUrl, {
-        width: 500,
-        selectFirst: false,
-        matchContains: true
-      });
+    cj("#role_contact").autocomplete( contactUrl, {
+      width: 500,
+      selectFirst: false,
+      matchContains: true
+    });
 
-      cj("#role_contact").focus();
-      cj("#role_contact").result(function(event, data, formatted) {
-        cj("input[id=role_contact_id]").val(data[1]);
-      });
+    cj("#role_contact").focus();
+
+    cj("#role_contact").result(function(event, data, formatted) {
+      cj("input[id=role_contact_id]").val(data[1]);
+    });
+
     cj( "#transfer_relationships" ).on( "click", function() {
       dialog.dialog( "open" );
     });
-
-
-
 });
 {/literal}
 </script>

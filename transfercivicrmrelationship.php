@@ -210,5 +210,20 @@ WHERE rel.contact_id_b = %1 AND rel.is_active = %2 AND (rel.end_date IS NULL OR 
     'weight'  => $weight,
     'count'   => $count
   );
+}
 
+/**
+ * Implements hook_civicrm_permission
+ *
+ * @param $permissions
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_permission
+ */
+function transfercivicrmrelationship_civicrm_permission(&$permissions) {
+  $prefix = ts('CiviCRM Transfer Relationships') . ': ';
+  $permissions['transfer relationships'] = $prefix . ts('transfer relationships');
+}
+function transfercivicrmrelationship_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
+  $permissions['relationship']['create'] = array('transfer relationships');
+  $permissions['relationship']['update'] = array('transfer relationships');
+  $permissions['relationship']['delete'] = array('transfer relationships');
 }
