@@ -192,7 +192,7 @@ cj( function() {
         {foreach from=$relationships item=rel}
           {if $rel.is_active eq 1}
             <tr class={$rowClass}>
-              {if $canTransferRelationship eq 1}<td><input type="checkbox" id="rel_{$rel.rel_id}" /></td>{/if}
+              {if $canTransferRelationship eq 1 and $rel.rel_end eq ''}<td><input type="checkbox" id="rel_{$rel.rel_id}" /></td>{else}<td></td>{/if}
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_id}</td>
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_type}</td>
               {if $rel.current_contact eq $rel.contact_id_a}
