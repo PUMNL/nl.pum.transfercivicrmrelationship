@@ -172,7 +172,7 @@ cj( function() {
     <table id="relationship-table" class="display">
       <thead>
         <tr>
-          {if $canTransferRelationship eq 1}<th class="sorting-disabled" rowspan="1" colspan="1"><input type="checkbox" id="rel_selectall" /></th>{/if}
+          {if $canTransferRelationship eq 1}<th class="sorting-disabled" rowspan="1" colspan="1"><input type="checkbox" id="rel_selectall" /></th>{else}{/if}
           <th class="sorting-disabled" rowspan="1" colspan="1">Rel ID</th>
           <th class="sorting-disabled" rowspan="1" colspan="1">Type</th>
           <th class="sorting-disabled" rowspan="1" colspan="1">With contact</th>
@@ -192,7 +192,7 @@ cj( function() {
         {foreach from=$relationships item=rel}
           {if $rel.is_active eq 1}
             <tr class={$rowClass}>
-              {if $canTransferRelationship eq 1 and $rel.rel_end eq ''}<td><input type="checkbox" id="rel_{$rel.rel_id}" /></td>{else}<td></td>{/if}
+              {if $canTransferRelationship eq 1}{if $rel.rel_end eq ''}<td><input type="checkbox" id="rel_{$rel.rel_id}" /></td>{else}<td></td>{/if}{/if}
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_id}</td>
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_type}</td>
               {if $rel.current_contact eq $rel.contact_id_a}
@@ -242,7 +242,7 @@ cj( function() {
         {foreach from=$relationships item=irel name=rel}
           {if $irel.is_active eq 0}
             <tr class={$rowClass}>
-              {if $canTransferRelationship eq 1}<td></td>{/if}
+              {if $canTransferRelationship eq 1}<td></td>{else}{/if}
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_id}</td>
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_type}</td>
               {if $irel.current_contact eq $irel.contact_id_a}

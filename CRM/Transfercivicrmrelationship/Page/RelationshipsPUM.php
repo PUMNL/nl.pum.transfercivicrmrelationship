@@ -36,13 +36,8 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
     global $user;
 
     $canTransferRelationship = FALSE;
-    if(in_array('administrator',$user->roles)) {
-      $canTransferRelationship = TRUE;
-    } else if(in_array('P&O', $user->roles)) {
-      $canTransferRelationship = TRUE;
-    } else if(in_array('SSO', $user->roles)) {
-      $canTransferRelationship = TRUE;
-    } else if(in_array('Prof', $user->roles)) {
+
+    if(user_access('transfer relationships') == TRUE) {
       $canTransferRelationship = TRUE;
     } else {
       $canTransferRelationship = FALSE;
