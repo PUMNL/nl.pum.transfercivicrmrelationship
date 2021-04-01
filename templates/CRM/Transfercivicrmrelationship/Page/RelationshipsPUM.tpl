@@ -192,7 +192,7 @@ cj( function() {
       <tbody>
         {assign var="rowClass" value="odd-row"}
         {foreach from=$relationships item=rel}
-          {if $rel.is_active eq 1}
+          {if $rel.is_active eq 1 and $rel.active_relationship eq 1}
             <tr class={$rowClass}>
               {if $canTransferRelationship eq 1}{if $rel.rel_end eq ''}<td><input type="checkbox" id="rel_{$rel.rel_id}" /></td>{else}<td></td>{/if}{/if}
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{$rel.rel_id}</td>
@@ -242,7 +242,7 @@ cj( function() {
         {/foreach}
 
         {foreach from=$relationships item=irel name=rel}
-          {if $irel.is_active eq 0}
+          {if $irel.is_active eq 0 or $irel.active_relationship eq 0}
             <tr class={$rowClass}>
               {if $canTransferRelationship eq 1}<td></td>{else}{/if}
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.rel_id}</td>

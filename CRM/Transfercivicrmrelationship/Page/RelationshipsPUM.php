@@ -24,6 +24,11 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
 
     while($daoRelationships->fetch()) {
       $row = $this->buildRow($daoRelationships);
+      if(!empty($row['rel_end']) && (strtotime($row['rel_end']) < time())){
+        $row['active_relationship'] = 0;
+      } else {
+        $row['active_relationship'] = 1;
+      }
       $displayRelationships[] = $row;
     }
 
