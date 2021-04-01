@@ -168,7 +168,9 @@ cj( function() {
     <a accesskey="N" href="/civicrm/contact/view/rel?cid={$clientId}&amp;action=add&amp;reset=1" class="button"><span><div class="icon add-icon"></div>Add Relationship</span></a>
     {if $canTransferRelationship eq 1}<a accesskey="N" href="#" class="button" id="transfer_relationships"><span><div class="icon add-icon"></div>Transfer Relationship</span></a>{/if}
   </div>
+
   <div id="relationship_wrapper" class="dataTables_wrapper">
+    {include file="CRM/common/jsortable.tpl" useAjax=0}
     <table id="relationship-table" class="display">
       <thead>
         <tr>
@@ -225,9 +227,9 @@ cj( function() {
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{if $rel.case_id}<a href="/civicrm/contact/view/case?reset=1&id={$rel.case_id}&cid={$rel.contact_id_a}&action=view&context=case&selectedChild=case">{$rel.case_id}</a>{/if}</td>
               <td{if $rel.is_deleted eq 1} class="font-red"{/if}>{if $rel.case_id}{$rel.actions} {$rel.moreActions}{/if}</td>
               {if $rel.current_contact eq $rel.contact_id_a}
-                <td><a href="/civicrm/contact/view/rel?action=view&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=a_b&selectedChild=rel">View</a> | <a href="/civicrm/contact/view/rel?action=update&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=a_b">Edit</a></td>
+                <td><a href="/civicrm/contact/view/rel?action=view&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=a_b&selectedChild=rel">View</a> | <a href="/civicrm/contact/view/rel?action=update&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=a_b">Edit</a> | <a href="/civicrm/contact/view/rel?action=disable&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=a_b">Disable</a> | <a href="/civicrm/contact/view/rel?action=delete&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=a_b">Delete</a></td>
               {elseif $rel.current_contact eq $rel.contact_id_b}
-                <td><a href="/civicrm/contact/view/rel?action=view&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=b_a&selectedChild=rel">View</a> | <a href="/civicrm/contact/view/rel?action=update&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=b_a">Edit</a></td>
+                <td><a href="/civicrm/contact/view/rel?action=view&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=b_a&selectedChild=rel">View</a> | <a href="/civicrm/contact/view/rel?action=update&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=b_a">Edit</a> | <a href="/civicrm/contact/view/rel?action=disable&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=b_a">Disable</a> | <a href="/civicrm/contact/view/rel?action=delete&reset=1&cid={$rel.current_contact}&id={$rel.rel_id}&rtype=b_a">Delete</a></td>
               {/if}
             </tr>
           {/if}
@@ -276,9 +278,9 @@ cj( function() {
               <td{if $irel.is_deleted eq 1} class="font-red"{/if} style="color: grey;">{$irel.actions} {$irel.moreActions}</td>
               </td>
               {if $irel.current_contact eq $irel.contact_id_a}
-                <td><a href="/civicrm/contact/view/rel?action=view&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=a_b&selectedChild=rel">View</a> | <a href="/civicrm/contact/view/rel?action=update&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=a_b">Edit</a></td>
+                <td><a href="/civicrm/contact/view/rel?action=view&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=a_b&selectedChild=rel">View</a> | <a href="/civicrm/contact/view/rel?action=update&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=a_b">Edit</a> | <a href="/civicrm/contact/view/rel?action=enable&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=a_b">Enable</a></td>
               {elseif $irel.current_contact eq $irel.contact_id_b}
-                <td><a href="/civicrm/contact/view/rel?action=view&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=b_a&selectedChild=rel">View</a> | <a href="/civicrm/contact/view/rel?action=update&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=b_a">Edit</a></td>
+                <td><a href="/civicrm/contact/view/rel?action=view&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=b_a&selectedChild=rel">View</a> | <a href="/civicrm/contact/view/rel?action=update&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=b_a">Edit</a> | <a href="/civicrm/contact/view/rel?action=enable&reset=1&cid={$irel.current_contact}&id={$irel.rel_id}&rtype=b_a">Enable</a></td>
               {/if}
             </tr>
           {/if}
