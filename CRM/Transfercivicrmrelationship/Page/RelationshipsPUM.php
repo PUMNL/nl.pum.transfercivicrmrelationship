@@ -24,7 +24,10 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
 
     while($daoRelationships->fetch()) {
       $row = $this->buildRow($daoRelationships);
-      if(!empty($row['rel_end']) && (strtotime($row['rel_end']) < time())){
+
+      if( (!empty($row['is_active']) && $row['is_active'] == 0) ||
+          (!empty($row['rel_end']) && (strtotime($row['rel_end']) < time())) ||
+          ($row['case_status'] == 'Completed' || $row['case_status'] == 'Cancelled' || $row['case_status'] == 'Accepted' || $row['case_status'] == 'Declined' || $row['case_status'] == 'Error')) {
         $row['active_relationship'] = 0;
       } else {
         $row['active_relationship'] = 1;
@@ -73,7 +76,26 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
   protected function getDaoRelationships() {
     $params = array();
     list($offset, $limit) = $this->_pager->getOffsetAndRowCount();
-    $query = "SELECT DISTINCT rel.id as 'rel_id', rel.contact_id_a, rel.contact_id_b, rel.case_id, rt.label_a_b as 'rel_type', cta.display_name as 'contact_a_name', ctb.display_name as 'contact_b_name', rel.start_date as 'rel_start', rel.end_date as 'rel_end', adra.city as 'rela_city', adrb.city as 'relb_city', ctya.name as 'rela_country', ctyb.name as 'relb_country', emla.email as 'rela_email', emlb.email as 'relb_email', tela.phone AS 'rela_phone', telb.phone AS 'relb_phone', rel.is_active FROM civicrm_relationship rel
+    $query = "SELECT
+                DISTINCT rel.id as 'rel_id',
+                rel.contact_id_a, rel.contact_id_b,
+                rel.case_id,
+                cstat.label as 'case_status',
+                rt.label_a_b as 'rel_type',
+                cta.display_name as 'contact_a_name',
+                ctb.display_name as 'contact_b_name',
+                rel.start_date as 'rel_start',
+                rel.end_date as 'rel_end',
+                adra.city as 'rela_city',
+                adrb.city as 'relb_city',
+                ctya.name as 'rela_country',
+                ctyb.name as 'relb_country',
+                emla.email as 'rela_email',
+                emlb.email as 'relb_email',
+                tela.phone AS 'rela_phone',
+                telb.phone AS 'relb_phone',
+                rel.is_active
+              FROM civicrm_relationship rel
               LEFT JOIN civicrm_relationship_type rt ON rt.id = rel.relationship_type_id
               LEFT JOIN civicrm_contact cta ON cta.id = rel.contact_id_a
               LEFT JOIN civicrm_contact ctb ON ctb.id = rel.contact_id_b
@@ -85,11 +107,13 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
               LEFT JOIN civicrm_email emlb ON emlb.contact_id = rel.contact_id_b AND emlb.is_primary = 1
               LEFT JOIN civicrm_phone tela ON tela.contact_id = rel.contact_id_a AND tela.is_primary = 1
               LEFT JOIN civicrm_phone telb ON telb.contact_id = rel.contact_id_b AND telb.is_primary = 1
+              LEFT JOIN civicrm_case c ON c.id = rel.case_id
+              LEFT JOIN civicrm_option_value cstat ON cstat.value = c.status_id AND cstat.option_group_id = (SELECT id FROM civicrm_option_group WHERE name = 'case_status')
               WHERE rel.contact_id_a = %1 OR rel.contact_id_b = %1
               ";
 
-    $query .= " ORDER BY is_active DESC,rel.end_date IS NULL DESC,rel.start_date DESC
-              LIMIT %2, %3";
+    $query .= "ORDER BY rel.end_date IS NULL DESC, is_active DESC, rel.start_date DESC, rel.end_date DESC
+               LIMIT %2, %3";
 
     $params = array(1 => array($this->clientId, 'Integer'),
                     2 => array($offset, 'Integer'),
@@ -130,6 +154,7 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
     $displayRow['contact_a_name'] = $dao->contact_a_name;
     $displayRow['contact_b_name'] = $dao->contact_b_name;
     $displayRow['case_id'] = $dao->case_id;
+    $displayRow['case_status'] = $dao->case_status;
     $displayRow['rel_start'] = $dao->rel_start;
     $displayRow['rel_end'] = $dao->rel_end;
     $displayRow['rela_city'] = $dao->rela_city;
