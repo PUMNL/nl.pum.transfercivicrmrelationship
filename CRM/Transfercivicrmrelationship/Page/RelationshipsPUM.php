@@ -21,6 +21,7 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
     $displayInactiveRelationships = array();
     $this->initializePager();
     $daoRelationships = $this->getDaoRelationships();
+    $relationshipTypes = $this->getRelationshipTypes();
 
     while($daoRelationships->fetch()) {
       $row = $this->buildRow($daoRelationships);
@@ -54,9 +55,11 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
     $this->assign('canTransferRelationship', $canTransferRelationship);
     $this->assign('clientId', $this->clientId);
     $this->assign('relationships', $displayRelationships);
+    $this->assign('relationshipTypes', $relationshipTypes);
     $this->assign('currentPage',$this->_pager->_currentPage);
     $this->assign('totalPages',$this->_pager->_totalPages);
     $this->assign('numActiveRelationships', $numActiveRelationships);
+    $this->assign('selected_relationship_type', $_GET['relationship_type']);
 
     parent::run();
   }
@@ -76,6 +79,9 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
   protected function getDaoRelationships() {
     $params = array();
     list($offset, $limit) = $this->_pager->getOffsetAndRowCount();
+
+    $filter_relationshiptype = $_GET['relationship_type'];
+
     $query = "SELECT
                 DISTINCT rel.id as 'rel_id',
                 rel.contact_id_a, rel.contact_id_b,
@@ -109,16 +115,22 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
               LEFT JOIN civicrm_phone telb ON telb.contact_id = rel.contact_id_b AND telb.is_primary = 1
               LEFT JOIN civicrm_case c ON c.id = rel.case_id
               LEFT JOIN civicrm_option_value cstat ON cstat.value = c.status_id AND cstat.option_group_id = (SELECT id FROM civicrm_option_group WHERE name = 'case_status')
-              WHERE rel.contact_id_a = %1 OR rel.contact_id_b = %1
-              ";
+              WHERE (rel.contact_id_a = %1 OR rel.contact_id_b = %1)";
 
-    $query .= "ORDER BY rel.end_date IS NULL DESC, is_active DESC, rel.start_date DESC, rel.end_date DESC
-               LIMIT %2, %3";
+    if(!empty($filter_relationshiptype) && is_int((int)$filter_relationshiptype) && $filter_relationshiptype != 'all'){
+      $query .= " AND rel.relationship_type_id = %4 ";
+    }
+    $query .= "
+                ORDER BY rel.end_date IS NULL DESC, is_active DESC, rel.start_date DESC, rel.end_date DESC
+                LIMIT %2, %3";
 
     $params = array(1 => array($this->clientId, 'Integer'),
                     2 => array($offset, 'Integer'),
-                    3 => array($limit, 'Integer')
-    );
+                    3 => array($limit, 'Integer'));
+
+    if(!empty($filter_relationshiptype) && is_int((int)$filter_relationshiptype) && $filter_relationshiptype != 'all'){
+      $params[4] = array((int)$filter_relationshiptype, 'Integer');
+    }
 
     return CRM_Core_DAO::executeQuery($query, $params);
   }
@@ -134,6 +146,29 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
     $query = "SELECT DISTINCT rel.id as 'rel_id' FROM civicrm_relationship rel
               WHERE (rel.contact_id_a = %1 OR rel.contact_id_b = %1) AND rel.is_active = 1 AND (rel.end_date IS NULL OR rel.end_date > NOW())";
     return CRM_Core_DAO::executeQuery($query, $params);
+  }
+
+  /**
+   * Function to get relationship types
+   *
+   * @return array $relationship_types
+   * @access protected
+   */
+  protected function getRelationshipTypes() {
+    $params_relationship_types = array(
+      'version' => 3,
+      'sequential' => 1,
+      'rowCount' => 0,
+    );
+    $api_relationship_types = civicrm_api('RelationshipType', 'get', $params_relationship_types);
+
+    $relationship_types = array();
+    if(is_array($api_relationship_types['values']) && count($api_relationship_types['values']) > 0){
+      foreach($api_relationship_types['values'] as $key => $value){
+        $relationship_types[$value['id']] = $value['name_a_b'];
+      }
+    }
+    return $relationship_types;
   }
 
   /**

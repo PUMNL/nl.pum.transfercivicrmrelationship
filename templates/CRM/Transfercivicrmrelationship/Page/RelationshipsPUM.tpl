@@ -153,6 +153,11 @@ cj( function() {
     cj( "#transfer_relationships" ).on( "click", function() {
       dialog.dialog( "open" );
     });
+
+    cj('#relationship-types').change(function(){
+      var current_cid = getUrlParameter('cid');
+      cj('#Relationships_PUM').load(CRM.url('civicrm/relationshipspum',{snippet: 1, cid: current_cid, relationship_type: cj(this).val()}));
+    });
 });
 {/literal}
 </script>
@@ -167,6 +172,17 @@ cj( function() {
   <div class="action-link">
     <a accesskey="N" href="/civicrm/contact/view/rel?cid={$clientId}&amp;action=add&amp;reset=1" class="button"><span><div class="icon add-icon"></div>Add Relationship</span></a>
     {if $canTransferRelationship eq 1}<a accesskey="N" href="#" class="button" id="transfer_relationships"><span><div class="icon add-icon"></div>Transfer Relationship</span></a>{/if}
+    Filter:
+    <select id="relationship-types" style="height: 24px;">
+      <option value="all">All relationship types</option>
+      {foreach from=$relationshipTypes key=rel_id item=rel_type}
+        {if $selected_relationship_type eq $rel_id}
+        <option value="{$rel_id}" selected>{$rel_type}</option>
+        {else}
+        <option value="{$rel_id}">{$rel_type}</option>
+        {/if}
+      {/foreach}
+    </select>
   </div>
 
   <div id="relationship_wrapper" class="dataTables_wrapper">
