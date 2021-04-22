@@ -168,6 +168,7 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
         $relationship_types[$value['id']] = $value['name_a_b'];
       }
     }
+    asort($relationship_types);
     return $relationship_types;
   }
 
