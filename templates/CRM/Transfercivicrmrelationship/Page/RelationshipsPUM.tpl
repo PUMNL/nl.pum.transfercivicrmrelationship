@@ -96,6 +96,25 @@ cj( function() {
       title: ts('Transfer Relationships', {domain: 'nl.pum.transfercivicrmrelationship'}),
       resizable: false,
 
+      open:function() {
+        /* set defaults if editing */
+        cj("#role_contact").val( "" );
+        cj("#role_contact_id").val( null );
+
+        var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=caseview' h=0 }"{literal};
+
+        cj("#role_contact").autocomplete( contactUrl, {
+          width: 500,
+          selectFirst: false,
+          matchContains: true
+        });
+
+        cj("#role_contact").focus();
+        cj("#role_contact").result(function(event, data, formatted) {
+          cj("input[id=role_contact_id]").val(data[1]);
+        });
+      },
+
       buttons: {
         'cancel': {
           text: ts('Cancel', {domain: 'nl.pum.transfercivicrmrelationship'}),
@@ -133,21 +152,7 @@ cj( function() {
             dialog.dialog('close');
           }
         }
-      }
-    });
-
-    var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=caseview' h=0 }"{literal};
-
-    cj("#role_contact").autocomplete( contactUrl, {
-      width: 500,
-      selectFirst: false,
-      matchContains: true
-    });
-
-    cj("#role_contact").focus();
-
-    cj("#role_contact").result(function(event, data, formatted) {
-      cj("input[id=role_contact_id]").val(data[1]);
+      },
     });
 
     cj( "#transfer_relationships" ).on( "click", function() {
