@@ -60,6 +60,8 @@ class CRM_Transfercivicrmrelationship_Page_RelationshipsPUM extends CRM_Core_Pag
     $this->assign('totalPages',$this->_pager->_totalPages);
     $this->assign('numActiveRelationships', $numActiveRelationships);
     $this->assign('selected_relationship_type', $_GET['relationship_type']);
+    $config = CRM_Core_Config::singleton();
+    $this->assign('extensionsURL', $config->extensionsURL);
 
     parent::run();
   }

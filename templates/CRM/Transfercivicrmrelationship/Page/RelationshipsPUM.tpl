@@ -1,5 +1,7 @@
 <script type="text/javascript">
 {literal}
+cj( "#please_wait" ).dialog({ autoOpen: false, height: 400, width: (cj('body').width() < 600 ? cj('body').width() + 'px' : '600px') });
+
 cj('#rel_selectall').click(function(){
   if(cj(this).prop("checked") == true){
     cj('#Relationships_PUM').find(':checkbox').each(function(){jQuery(this).prop('checked', true);});
@@ -7,6 +9,7 @@ cj('#rel_selectall').click(function(){
     cj('#Relationships_PUM').find(':checkbox').each(function(){jQuery(this).prop('checked', false);});
   }
 });
+cj('#transferRelationshipDialog').hide();
 
 function getUrlParameter(sParam) {
   var sPageURL = window.location.search.substring(1),
@@ -88,84 +91,90 @@ function transfer_relationship(relation_id, contact_id_a, to_contact_id, relatio
 
 cj( function() {
 
-  dialog = cj('#transferRelationshipDialog').dialog({
-      autoOpen: false,
-      height: 400,
-      width: (cj('body').width() < 600 ? cj('body').width() + 'px' : '600px'),
-      modal: true,
-      title: ts('Transfer Relationships', {domain: 'nl.pum.transfercivicrmrelationship'}),
-      resizable: false,
 
-      open:function() {
-        /* set defaults if editing */
-        cj("#role_contact").val( "" );
-        cj("#role_contact_id").val( null );
-
-        var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=caseview' h=0 }"{literal};
-
-        cj("#role_contact").autocomplete( contactUrl, {
-          width: 500,
-          selectFirst: false,
-          matchContains: true
-        });
-
-        cj("#role_contact").focus();
-        cj("#role_contact").result(function(event, data, formatted) {
-          cj("input[id=role_contact_id]").val(data[1]);
-        });
-      },
-
-      buttons: {
-        'cancel': {
-          text: ts('Cancel', {domain: 'nl.pum.transfercivicrmrelationship'}),
-          click: function() {
-            dialog.dialog('close');
-          }
-        },
-        'continue': {
-          text: ts('Continue', {domain: 'nl.pum.transfercivicrmrelationship'}),
-          click: function() {
-            cj('#Relationships_PUM').find(':checkbox').each(function(){
-              if(this.checked == true) {
-                var relation_id = '';
-
-                var contact_id_a = '';
-                var contact_id_b = getUrlParameter('cid');
-                relation_id = this.id.replace('rel_','');
-
-                CRM.api('Relationship', 'getsingle', {'sequential': 1, 'id': relation_id},{
-                  success: function(data) {
-                    if(data.contact_id_a != '' && data.contact_id_a != null) {
-                      if(data.contact_id_b != '' && data.relationship_type_id != ''){
-                        var date = new Date();
-                        var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
-                        var MM = ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1);
-                        var yyyy = date.getFullYear();
-
-                        transfer_relationship(data.id, data.contact_id_a, cj('#role_contact_id').val(), data.relationship_type_id, data.case_id, data.is_active);
-                      }
-                    }
-                  }
-                });
-              }
-            });
-            dialog.dialog('close');
-          }
-        }
-      },
-    });
 
     cj( "#transfer_relationships" ).on( "click", function() {
-      dialog.dialog( "open" );
+      dialog = cj('#transferRelationshipDialog').dialog({
+        autoOpen: false,
+        height: 400,
+        width: (cj('body').width() < 600 ? cj('body').width() + 'px' : '600px'),
+        modal: true,
+        title: ts('Transfer Relationships', {domain: 'nl.pum.transfercivicrmrelationship'}),
+        resizable: false,
+
+        open:function() {
+          /* set defaults if editing */
+          cj("#role_contact").val( "" );
+          cj("#role_contact_id").val( null );
+
+          var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=caseview' h=0 }"{literal};
+
+          cj("#role_contact").autocomplete( contactUrl, {
+            width: 500,
+            selectFirst: false,
+            matchContains: true
+          });
+
+          cj("#role_contact").focus();
+          cj("#role_contact").result(function(event, data, formatted) {
+            cj("input[id=role_contact_id]").val(data[1]);
+          });
+        },
+
+        buttons: {
+          'cancel': {
+            text: ts('Cancel', {domain: 'nl.pum.transfercivicrmrelationship'}),
+            click: function() {
+              dialog.dialog('close');
+            }
+          },
+          'continue': {
+            text: ts('Continue', {domain: 'nl.pum.transfercivicrmrelationship'}),
+            click: function() {
+              cj( "#please_wait" ).dialog( "open" );
+              cj('#Relationships_PUM').find(':checkbox').each(function(){
+                if(this.checked == true) {
+                  var relation_id = '';
+
+                  var contact_id_a = '';
+                  var contact_id_b = getUrlParameter('cid');
+                  relation_id = this.id.replace('rel_','');
+
+                  CRM.api('Relationship', 'getsingle', {'sequential': 1, 'id': relation_id},{
+                    success: function(data) {
+                      if(data.contact_id_a != '' && data.contact_id_a != null) {
+                        if(data.contact_id_b != '' && data.relationship_type_id != ''){
+                          var date = new Date();
+                          var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
+                          var MM = ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1);
+                          var yyyy = date.getFullYear();
+
+                          transfer_relationship(data.id, data.contact_id_a, cj('#role_contact_id').val(), data.relationship_type_id, data.case_id, data.is_active);
+                        }
+                      }
+                    }
+                  });
+                }
+              });
+              dialog.dialog('close');
+            }
+          }
+        },
+      });
+
+      dialog.dialog('open');
     });
 
     cj('#relationship-types').change(function(){
       var current_cid = getUrlParameter('cid');
+      cj('#Relationships_PUM').empty();
       cj('#Relationships_PUM').load(CRM.url('civicrm/relationshipspum',{snippet: 1, cid: current_cid, relationship_type: cj(this).val()}));
     });
 });
 {/literal}
 </script>
+
+<div id="please_wait" title="Please wait"><p>Relationships are being transferred. Please wait until page is refreshed.</p> <img src="{$extensionsURL}nl.pum.transfercivicrmrelationship/images/icon-loading.gif" width="64px" height="64px" /></div>
 
 <div id="transferRelationshipDialog" title="Transfer Relationships">
   <p class="info">To which contact do you want to transfer these relationships?</p>
