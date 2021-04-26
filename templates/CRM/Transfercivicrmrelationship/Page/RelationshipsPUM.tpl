@@ -45,54 +45,59 @@ function transfer_relationship(relation_id, contact_id_a, to_contact_id, relatio
   var MM = ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1);
   var yyyy = date.getFullYear();
 
-  if(!case_id || case_id.length == 0) {
-    CRM.api('Relationship', 'delete', {'id': relation_id},{
-      success: function(result) {
-        CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active}, {
-          success: function(data) {
-            cj('#Relationships_PUM').load(CRM.url('civicrm/relationshipspum',{snippet: 1, cid: current_cid}));
-            window.location.reload();
-          },
-          error: function(data) {
-            console.log('Error creating relationship 1');
-            console.log(data);
-          }
-        });
-      },
-      error: function(result) {
-        console.log('Error deleting relation id: '+relation_id);
-        console.log(result);
-      }
-    });
+  if(!Number.isInteger(relation_id)){
+    relation_id = Number(relation_id);
+  }
+
+  if(Number.isInteger(relation_id)){
+    if(!case_id || case_id.length == 0) {
+      CRM.api('Relationship', 'delete', {'id': relation_id},{
+        success: function(result) {
+          CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active}, {
+            success: function(data) {
+              cj('#Relationships_PUM').load(CRM.url('civicrm/relationshipspum',{snippet: 1, cid: current_cid}));
+              window.location.reload();
+            },
+            error: function(data) {
+              console.log('Error creating relationship 1');
+              console.log(data);
+            }
+          });
+        },
+        error: function(result) {
+          console.log('Error deleting relation id: '+relation_id);
+          console.log(result);
+        }
+      });
 
 
+    } else {
+      var date = new Date().toISOString().slice(0,10);
+
+      CRM.api('Relationship', 'delete', {'id': relation_id},{
+        success: function(result) {
+          CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active, 'case_id': case_id, 'check_permissions': 0}, {
+            success: function(result2) {
+              window.location.reload();
+            },
+            error: function(result3) {
+              console.log('Error creating relationship 2');
+              console.log(result3);
+            }
+          });
+        },
+        error: function(result) {
+          console.log('Error deleting relation id: '+relation_id);
+          console.log(result);
+        }
+      });
+    }
   } else {
-    var date = new Date().toISOString().slice(0,10);
-
-    CRM.api('Relationship', 'delete', {'id': relation_id},{
-      success: function(result) {
-        CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active, 'case_id': case_id, 'check_permissions': 0}, {
-          success: function(result2) {
-            window.location.reload();
-          },
-          error: function(result3) {
-            console.log('Error creating relationship 2');
-            console.log(result3);
-          }
-        });
-      },
-      error: function(result) {
-        console.log('Error deleting relation id: '+relation_id);
-        console.log(result);
-      }
-    });
+    CRM.alert(ts('Unable to transfer relationship ID: ')+relation_id, ts('Error transferring relationships'), 'error');
   }
 }
 
 cj( function() {
-
-
-
     cj( "#transfer_relationships" ).on( "click", function() {
       dialog = cj('#transferRelationshipDialog').dialog({
         autoOpen: false,
@@ -133,27 +138,27 @@ cj( function() {
             click: function() {
               cj( "#please_wait" ).dialog( "open" );
               cj('#Relationships_PUM').find(':checkbox').each(function(){
-                if(this.checked == true) {
+                if(this.checked == true && this.id != 'rel_selectall') {
                   var relation_id = '';
 
                   var contact_id_a = '';
                   var contact_id_b = getUrlParameter('cid');
                   relation_id = this.id.replace('rel_','');
 
-                  CRM.api('Relationship', 'getsingle', {'sequential': 1, 'id': relation_id},{
-                    success: function(data) {
-                      if(data.contact_id_a != '' && data.contact_id_a != null) {
-                        if(data.contact_id_b != '' && data.relationship_type_id != ''){
-                          var date = new Date();
-                          var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
-                          var MM = ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1);
-                          var yyyy = date.getFullYear();
-
-                          transfer_relationship(data.id, data.contact_id_a, cj('#role_contact_id').val(), data.relationship_type_id, data.case_id, data.is_active);
+                  if(!Number.isInteger(relation_id)){
+                    relation_id = Number(relation_id);
+                  }
+                  if(Number.isInteger(relation_id)){
+                    CRM.api('Relationship', 'getsingle', {'sequential': 1, 'id': Number(relation_id)},{
+                      success: function(data) {
+                        if(data.contact_id_a != '' && data.contact_id_a != null) {
+                          if(data.contact_id_b != '' && data.relationship_type_id != ''){
+                            transfer_relationship(data.id, data.contact_id_a, cj('#role_contact_id').val(), data.relationship_type_id, data.case_id, data.is_active);
+                          }
                         }
                       }
-                    }
-                  });
+                    });
+                  }
                 }
               });
               dialog.dialog('close');
