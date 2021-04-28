@@ -1,6 +1,7 @@
 <script type="text/javascript">
 {literal}
-cj( "#please_wait" ).dialog({ autoOpen: false, height: 400, width: (cj('body').width() < 600 ? cj('body').width() + 'px' : '600px') });
+cj( "#please_wait" ).dialog({ autoOpen: false, height: 400, width: (cj('body').width() < 600 ? cj('body').width() + 'px' : '600px') }).attr('id', 'please_wait');
+cj( "#transfer_succeeded" ).dialog({ autoOpen: false, height: 400, width: (cj('body').width() < 600 ? cj('body').width() + 'px' : '600px') }).attr('id', 'transfer_succeeded');
 
 cj('#rel_selectall').click(function(){
   if(cj(this).prop("checked") == true){
@@ -55,8 +56,7 @@ function transfer_relationship(relation_id, contact_id_a, to_contact_id, relatio
         success: function(result) {
           CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active}, {
             success: function(data) {
-              cj('#Relationships_PUM').load(CRM.url('civicrm/relationshipspum',{snippet: 1, cid: current_cid}));
-              window.location.reload();
+
             },
             error: function(data) {
               console.log('Error creating relationship 1');
@@ -78,7 +78,7 @@ function transfer_relationship(relation_id, contact_id_a, to_contact_id, relatio
         success: function(result) {
           CRM.api('Relationship', 'create', {'sequential': 1, 'contact_id_a': contact_id_a, 'contact_id_b': to_contact_id, 'relationship_type_id': relationship_type_id, 'start_date': yyyy+MM+dd+'000000', 'is_active': is_active, 'case_id': case_id, 'check_permissions': 0}, {
             success: function(result2) {
-              window.location.reload();
+
             },
             error: function(result3) {
               console.log('Error creating relationship 2');
@@ -137,7 +137,10 @@ cj( function() {
             text: ts('Continue', {domain: 'nl.pum.transfercivicrmrelationship'}),
             click: function() {
               cj( "#please_wait" ).dialog( "open" );
+              var itemsProcessed = 0;
+
               cj('#Relationships_PUM').find(':checkbox').each(function(){
+                itemsProcessed++;
                 if(this.checked == true && this.id != 'rel_selectall') {
                   var relation_id = '';
 
@@ -149,19 +152,32 @@ cj( function() {
                     relation_id = Number(relation_id);
                   }
                   if(Number.isInteger(relation_id)){
-                    CRM.api('Relationship', 'getsingle', {'sequential': 1, 'id': Number(relation_id)},{
+                    CRM.api('Relationship', 'getsingle', {'sequential': 0, 'id': relation_id},{
                       success: function(data) {
                         if(data.contact_id_a != '' && data.contact_id_a != null) {
                           if(data.contact_id_b != '' && data.relationship_type_id != ''){
                             transfer_relationship(data.id, data.contact_id_a, cj('#role_contact_id').val(), data.relationship_type_id, data.case_id, data.is_active);
                           }
                         }
+                        if(itemsProcessed == cj('#Relationships_PUM').find(':checkbox').length){
+                          cj('#please_wait').dialog('close');
+                          cj('#transferRelationshipDialog').dialog('close');
+                          cj('#transfer_succeeded').dialog('open');
+                          cj('#Relationships_PUM').empty();
+                          var current_cid = getUrlParameter('cid');
+                          cj('#Relationships_PUM').load(CRM.url('civicrm/relationshipspum',{snippet: 1, cid: current_cid, relationship_type: cj('#relationship-types').val()}));
+                        }
+                      },
+                      error: function(data){
+                        console.log('error data: ');
+                        console.log(data);
                       }
                     });
+                  } else {
+                    //skip
                   }
                 }
               });
-              dialog.dialog('close');
             }
           }
         },
@@ -180,6 +196,7 @@ cj( function() {
 </script>
 
 <div id="please_wait" title="Please wait"><p>Relationships are being transferred. Please wait until page is refreshed.</p> <img src="{$extensionsURL}nl.pum.transfercivicrmrelationship/images/icon-loading.gif" width="64px" height="64px" /></div>
+<div id="transfer_succeeded" title="Transfer succeeded"><p>Relationships have been transferred successfully!</p><p>It may take a few minutes before changes are visible in the relationship overview, but be patient, changes are processed in background.</p></div>
 
 <div id="transferRelationshipDialog" title="Transfer Relationships">
   <p class="info">To which contact do you want to transfer these relationships?</p>
