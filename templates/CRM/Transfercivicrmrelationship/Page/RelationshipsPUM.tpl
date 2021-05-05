@@ -357,16 +357,16 @@ cj( function() {
           {/if}
           <span style="margin-left:10px;">
           {if !empty($pager->linkTagsRaw.first.url)}
-          <input type="submit" onclick="cj('#Relationships_PUM').load('{$pager->linkTagsRaw.first.url}&snippet=1')" class="form-submit" style="cursor:pointer;" value="<< First" />&nbsp;
+          <input type="submit" onclick="cj('#Relationships_PUM').load('{$pager->linkTagsRaw.first.url}&snippet=1'); window.scrollTo(0, 0);" class="form-submit" style="cursor:pointer;" value="<< First" />&nbsp;
           {/if}
           {if !empty($pager->linkTagsRaw.prev.url)}
-          <input type="submit" onclick="cj('#Relationships_PUM').load('{$pager->linkTagsRaw.prev.url}&snippet=1')" class="form-submit" style="cursor:pointer;" value="< Previous" />&nbsp;
+          <input type="submit" onclick="cj('#Relationships_PUM').load('{$pager->linkTagsRaw.prev.url}&snippet=1'); window.scrollTo(0, 0);" class="form-submit" style="cursor:pointer;" value="< Previous" />&nbsp;
           {/if}
           {if !empty($pager->linkTagsRaw.next.url)}
-          <input type="submit" onclick="cj('#Relationships_PUM').load('{$pager->linkTagsRaw.next.url}&snippet=1')" class="form-submit" style="cursor:pointer;" value="Next >" />&nbsp;
+          <input type="submit" onclick="cj('#Relationships_PUM').load('{$pager->linkTagsRaw.next.url}&snippet=1'); window.scrollTo(0, 0);" class="form-submit" style="cursor:pointer;" value="Next >" />&nbsp;
           {/if}
           {if !empty($pager->linkTagsRaw.last.url)}
-          <input type="submit" onclick="cj('#Relationships_PUM').load('{$pager->linkTagsRaw.last.url}&snippet=1')" class="form-submit" style="cursor:pointer;" value="Last >>" />&nbsp;
+          <input type="submit" onclick="cj('#Relationships_PUM').load('{$pager->linkTagsRaw.last.url}&snippet=1'); window.scrollTo(0, 0);" class="form-submit" style="cursor:pointer;" value="Last >>" />&nbsp;
           {/if}
           {$pager->_response.status}
           </span>
